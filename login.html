@@ -1,32 +1,91 @@
-<!DOCTYPE html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>เข้าสู่ระบบ - By-ART</title>
+<!DOCTYPE html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>เข้าสู่ระบบ / สมัครสมาชิก - By-ART</title>
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@500;700;800&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css"></head><body><main>
-<header class="nav"><div class="brand">By-ART</div><div class="navlinks"><a class="btn" href="index.html">หน้าหลัก</a><a class="btn" href="pricing.html">แพ็กเกจ/เติมเครดิต</a></div></header>
-<h1>เข้าสู่ระบบ / สมัครสมาชิก</h1>
-<div class="card">
-  <p class="mu">เวอร์ชันเว็บไซต์สำหรับรันบน GitHub Pages (static): ระบบบัญชีนี้จัดเก็บสถานะในเบราว์เซอร์เครื่องนี้เพื่อการสาธิต/ใช้งานเบื้องต้น หากต้องการบัญชีจริง ข้ามเครื่อง และตรวจสอบการชำระเงินจริงอัตโนมัติ ต้องเชื่อมต่อระบบหลังบ้าน (backend + ฐานข้อมูล + ผู้ให้บริการชำระเงิน)</p>
-  <label for="email">อีเมล</label>
-  <input id="email" type="email" placeholder="you@example.com">
-  <label for="pass">รหัสผ่าน</label>
-  <input id="pass" type="password" placeholder="รหัสผ่าน (สำหรับเดโมเก็บในเบราว์เซอร์)">
-  <div class="row" style="margin-top:12px"><button class="btn pri" id="loginBtn">เข้าสู่ระบบ / สมัคร</button><button class="btn ghost" id="logoutBtn">ออกจากระบบ</button></div>
-  <div id="msg" class="warn small" style="margin-top:12px"></div>
+<link rel="stylesheet" href="style.css">
+<style>
+.auth-wrap{max-width:460px;margin:10px auto}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:rgba(255,255,255,.03);padding:6px;border-radius:14px;border:1px solid var(--ln);margin-bottom:14px}
+.tab{padding:10px;border-radius:10px;border:0;background:transparent;color:var(--mu);font:700 1rem Prompt,sans-serif;cursor:pointer}
+.tab.active{background:linear-gradient(135deg,var(--ac),#43d97b);color:#07110b}
+.field{margin-bottom:10px}
+.muted{color:var(--mu);font-size:.95rem}
+.msg{margin-top:12px;padding:12px 14px;border-radius:12px;border-left:4px solid var(--ac);background:rgba(255,255,255,.04)}
+.msg.err{border-left-color:var(--hot)}
+.hidden{display:none}
+</style></head><body><main>
+<header class="nav"><div class="brand">By-ART</div><div class="navlinks"><a class="btn" href="index.html">หน้าหลัก</a><a class="btn" href="pricing.html">แพ็กเกจ/ราคาที่ถูกลง</a><a class="btn" href="account.html">บัญชีของฉัน</a></div></header>
+<div class="auth-wrap">
+  <h1 style="text-align:center">บัญชีผู้ใช้</h1>
+  <p class="muted" style="text-align:center;margin-top:-4px">เข้าสู่ระบบหรือสมัครสมาชิกเพื่อจัดการแพ็กเกจและสิทธิ์ดาวน์โหลด</p>
+  <div class="card">
+    <div class="tabs"><button class="tab active" id="tabLogin" type="button">เข้าสู่ระบบ</button><button class="tab" id="tabReg" type="button">สมัครสมาชิก</button></div>
+
+    <div id="loginForm">
+      <div class="field"><label for="lemail">อีเมล</label><input id="lemail" type="email" placeholder="example@email.com" autocomplete="email"></div>
+      <div class="field"><label for="lpass">รหัสผ่าน</label><input id="lpass" type="password" placeholder="รหัสผ่าน" autocomplete="current-password"></div>
+      <button class="btn pri" id="loginBtn" style="width:100%;margin-top:6px">เข้าสู่ระบบ</button>
+    </div>
+
+    <div id="regForm" class="hidden">
+      <div class="field"><label for="rname">ชื่อที่แสดง</label><input id="rname" type="text" placeholder="ชื่อของคุณ"></div>
+      <div class="field"><label for="remail">อีเมล</label><input id="remail" type="email" placeholder="example@email.com" autocomplete="email"></div>
+      <div class="field"><label for="rpass">รหัสผ่าน</label><input id="rpass" type="password" placeholder="อย่างน้อย 4 ตัวอักษร" autocomplete="new-password"></div>
+      <div class="field"><label for="rpass2">ยืนยันรหัสผ่าน</label><input id="rpass2" type="password" placeholder="กรอกรหัสผ่านอีกครั้ง" autocomplete="new-password"></div>
+      <button class="btn pri" id="regBtn" style="width:100%;margin-top:6px">สมัครสมาชิก</button>
+    </div>
+
+    <div id="msg" class="msg" role="status">กรอกข้อมูลเพื่อเข้าสู่ระบบหรือสมัครสมาชิก</div>
+    <div class="muted" style="margin-top:10px;font-size:.9rem">* เว็บไซต์นี้โฮสต์แบบ static (GitHub Pages): ขณะนี้ระบบบัญชี/สถานะจัดเก็บในเบราว์เซอร์เครื่องนี้เพื่อให้ใช้งานและทดสอบโฟลว์ได้ หากต้องการบัญชีจริง ข้ามอุปกรณ์ และยืนยันการชำระเงินจริงอัตโนมัติ ต้องเชื่อมระบบหลังบ้าน (backend + ฐานข้อมูล + ผู้ให้บริการชำระเงิน)</div>
+  </div>
+  <div class="card" id="loggedBox" class="hidden" style="display:none">
+    <b>สถานะ:</b> <span id="who"></span>
+    <div class="row" style="margin-top:10px"><a class="btn pri" href="account.html">ไปที่บัญชีของฉัน</a><button class="btn ghost" id="logoutBtn">ออกจากระบบ</button></div>
+  </div>
 </div>
 <script src="app.js"></script>
 <script>
+const tabLogin=document.getElementById('tabLogin'), tabReg=document.getElementById('tabReg');
+const loginForm=document.getElementById('loginForm'), regForm=document.getElementById('regForm');
 const msg=document.getElementById('msg');
-function refresh(){ const u=getUser(); msg.textContent = u? ('กำลังใช้งานบัญชี: '+u+' — ไปที่หน้า "บัญชีของฉัน" เพื่อดูเครดิต/แพ็กเกจ/สิทธิ์ดาวน์โหลด') : 'ยังไม่ได้เข้าสู่ระบบ'; }
+function showTab(which){
+  const isLogin=which==='login';
+  tabLogin.classList.toggle('active',isLogin); tabReg.classList.toggle('active',!isLogin);
+  loginForm.classList.toggle('hidden',!isLogin); regForm.classList.toggle('hidden',isLogin);
+  msg.className='msg'; msg.textContent = isLogin? 'กรอกอีเมลและรหัสผ่านเพื่อเข้าสู่ระบบ' : 'กรอกข้อมูลเพื่อสมัครสมาชิก';
+}
+tabLogin.onclick=()=>showTab('login'); tabReg.onclick=()=>showTab('reg');
+function setMsg(t,err){ msg.textContent=t; msg.className='msg'+(err?' err':''); }
+function refreshLogged(){
+  const u=getUser(); const box=document.getElementById('loggedBox');
+  if(u){ box.style.display='block'; document.getElementById('who').textContent='เข้าสู่ระบบแล้ว: '+u; }
+  else { box.style.display='none'; }
+}
 document.getElementById('loginBtn').onclick=()=>{
-  const email=(document.getElementById('email').value||'').trim().toLower();
-  const pass=(document.getElementById('pass').value||'').trim();
-  if(!email||!pass){ msg.textContent='กรุณากรอกอีเมลและรหัสผ่าน'; return; }
+  const email=(document.getElementById('lemail').value||'').trim().toLowerCase();
+  const pass=(document.getElementById('lpass').value||'').trim();
+  if(!email||!pass){ setMsg('กรุณากรอกอีเมลและรหัสผ่าน',true); return; }
   const s=loadState(); s.auth=s.auth||{};
-  if(!s.auth[email]){ s.auth[email]={pass}; saveState(s); ensureAccount(email); setUser(email); msg.textContent='สมัครสมาชิกและเข้าสู่ระบบสำเร็จ (เดโม)'; }
-  else if(s.auth[email].pass!==pass){ msg.textContent='รหัสผ่านไม่ถูกต้อง (เดโม)'; return; }
-  else { ensureAccount(email); setUser(email); msg.textContent='เข้าสู่ระบบสำเร็จ'; }
-  setTimeout(()=>location.href='account.html',400);
+  if(!s.auth[email]){ setMsg('ไม่พบบัญชีนี้ กรุณาสมัครสมาชิกก่อน',true); showTab('reg'); document.getElementById('remail').value=email; return; }
+  if(s.auth[email].pass!==pass){ setMsg('รหัสผ่านไม่ถูกต้อง',true); return; }
+  ensureAccount(email); setUser(email); setMsg('เข้าสู่ระบบสำเร็จ กำลังไปหน้าบัญชี...');
+  refreshLogged(); setTimeout(()=>location.href='account.html',500);
 };
-document.getElementById('logoutBtn').onclick=()=>{ const s=loadState(); s.user=null; saveState(s); refresh(); };
-refresh();
+document.getElementById('regBtn').onclick=()=>{
+  const name=(document.getElementById('rname').value||'').trim();
+  const email=(document.getElementById('remail').value||'').trim().toLowerCase();
+  const pass=(document.getElementById('rpass').value||'').trim();
+  const pass2=(document.getElementById('rpass2').value||'').trim();
+  if(!email||!pass){ setMsg('กรุณากรอกอีเมลและรหัสผ่าน',true); return; }
+  if(pass.length<4){ setMsg('รหัสผ่านควรมีอย่างน้อย 4 ตัวอักษร',true); return; }
+  if(pass!==pass2){ setMsg('รหัสผ่านยืนยันไม่ตรงกัน',true); return; }
+  const s=loadState(); s.auth=s.auth||{}; s.profiles=s.profiles||{};
+  if(s.auth[email]){ setMsg('อีเมลนี้มีบัญชีอยู่แล้ว กรุณาเข้าสู่ระบบ',true); showTab('login'); document.getElementById('lemail').value=email; return; }
+  s.auth[email]={pass}; s.profiles[email]={name}; saveState(s);
+  ensureAccount(email); setUser(email);
+  setMsg('สมัครสมาชิกสำเร็จ กำลังไปหน้าบัญชี...');
+  refreshLogged(); setTimeout(()=>location.href='account.html',600);
+};
+document.getElementById('logoutBtn').onclick=()=>{ const s=loadState(); s.user=null; saveState(s); setMsg('ออกจากระบบแล้ว'); refreshLogged(); };
+refreshLogged();
+if(getUser()){ setMsg('คุณเข้าสู่ระบบอยู่แล้ว สามารถไปที่บัญชีของฉันได้'); }
 </script>
 </main></body></html>
