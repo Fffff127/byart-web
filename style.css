@@ -1,0 +1,18 @@
+:root{color-scheme:dark;--bg:#0b120f;--sf:#142019;--ink:#e9f7ef;--mu:#93ad9f;--ac:#7cf29a;--ac2:#2dd4bf;--hot:#ff6b6b;--ln:#274235}
+*{box-sizing:border-box}body{margin:0;color:var(--ink);font:400 16px/1.7 Sarabun,"Noto Sans Thai",sans-serif;background:radial-gradient(900px 400px at 10% -10%, rgba(124,242,154,.18), transparent 60%),radial-gradient(700px 300px at 100% 0%, rgba(45,212,191,.14), transparent 55%),linear-gradient(180deg,#0b120f,#0e1713 40%, #0b120f)}
+a{color:inherit}main{max-width:980px;margin:auto;padding:24px 18px 50px}
+header.nav{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:10px}
+.brand{font:800 1.4rem Prompt,sans-serif;color:var(--ac)}.navlinks{display:flex;gap:8px;flex-wrap:wrap}
+h1{font:800 clamp(1.8rem,4vw,2.8rem)/1.15 Prompt,sans-serif;margin:8px 0}.mu{color:var(--mu)}
+.card{position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(22,34,28,.92),rgba(16,26,21,.88));border:1px solid var(--ln);border-radius:20px;padding:22px;margin:14px 0;box-shadow:0 20px 60px rgba(0,0,0,.28)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.btn{display:inline-block;font:600 .98rem Sarabun,sans-serif;padding:10px 16px;border-radius:999px;border:1px solid rgba(124,242,154,.35);background:rgba(124,242,154,.12);color:var(--ink);text-decoration:none;cursor:pointer}
+.btn.pri{background:linear-gradient(135deg,var(--ac),#43d97b);color:#07110b;border-color:transparent}.btn.ghost{background:transparent}
+input,select{width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--ln);background:#0f1914;color:var(--ink);font:inherit}
+label{display:block;margin:8px 0 4px}
+table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid var(--ln);text-align:left}
+.badge{display:inline-block;padding:3px 10px;border-radius:999px;background:rgba(124,242,154,.15);border:1px solid rgba(124,242,154,.3);font:700 .85rem Prompt,sans-serif}
+.warn{background:rgba(255,255,255,.04);border-left:4px solid var(--ac);padding:12px 14px;border-radius:0 12px 12px 0;margin-top:10px}
+.danger{border-left-color:var(--hot)}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.qrbox{position:relative;display:inline-block;border-radius:16px;overflow:hidden;background:#fff;padding:10px}.qrbox img{display:block;max-width:240px;width:100%;height:auto}.qr-mask{position:absolute;left:6%;right:6%;top:6%;height:18%;background:#fff}
+.small{font-size:.92rem}

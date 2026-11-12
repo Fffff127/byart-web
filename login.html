@@ -1,0 +1,32 @@
+<!DOCTYPE html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>เข้าสู่ระบบ - By-ART</title>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@500;700;800&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css"></head><body><main>
+<header class="nav"><div class="brand">By-ART</div><div class="navlinks"><a class="btn" href="index.html">หน้าหลัก</a><a class="btn" href="pricing.html">แพ็กเกจ/เติมเครดิต</a></div></header>
+<h1>เข้าสู่ระบบ / สมัครสมาชิก</h1>
+<div class="card">
+  <p class="mu">เวอร์ชันเว็บไซต์สำหรับรันบน GitHub Pages (static): ระบบบัญชีนี้จัดเก็บสถานะในเบราว์เซอร์เครื่องนี้เพื่อการสาธิต/ใช้งานเบื้องต้น หากต้องการบัญชีจริง ข้ามเครื่อง และตรวจสอบการชำระเงินจริงอัตโนมัติ ต้องเชื่อมต่อระบบหลังบ้าน (backend + ฐานข้อมูล + ผู้ให้บริการชำระเงิน)</p>
+  <label for="email">อีเมล</label>
+  <input id="email" type="email" placeholder="you@example.com">
+  <label for="pass">รหัสผ่าน</label>
+  <input id="pass" type="password" placeholder="รหัสผ่าน (สำหรับเดโมเก็บในเบราว์เซอร์)">
+  <div class="row" style="margin-top:12px"><button class="btn pri" id="loginBtn">เข้าสู่ระบบ / สมัคร</button><button class="btn ghost" id="logoutBtn">ออกจากระบบ</button></div>
+  <div id="msg" class="warn small" style="margin-top:12px"></div>
+</div>
+<script src="app.js"></script>
+<script>
+const msg=document.getElementById('msg');
+function refresh(){ const u=getUser(); msg.textContent = u? ('กำลังใช้งานบัญชี: '+u+' — ไปที่หน้า "บัญชีของฉัน" เพื่อดูเครดิต/แพ็กเกจ/สิทธิ์ดาวน์โหลด') : 'ยังไม่ได้เข้าสู่ระบบ'; }
+document.getElementById('loginBtn').onclick=()=>{
+  const email=(document.getElementById('email').value||'').trim().toLower();
+  const pass=(document.getElementById('pass').value||'').trim();
+  if(!email||!pass){ msg.textContent='กรุณากรอกอีเมลและรหัสผ่าน'; return; }
+  const s=loadState(); s.auth=s.auth||{};
+  if(!s.auth[email]){ s.auth[email]={pass}; saveState(s); ensureAccount(email); setUser(email); msg.textContent='สมัครสมาชิกและเข้าสู่ระบบสำเร็จ (เดโม)'; }
+  else if(s.auth[email].pass!==pass){ msg.textContent='รหัสผ่านไม่ถูกต้อง (เดโม)'; return; }
+  else { ensureAccount(email); setUser(email); msg.textContent='เข้าสู่ระบบสำเร็จ'; }
+  setTimeout(()=>location.href='account.html',400);
+};
+document.getElementById('logoutBtn').onclick=()=>{ const s=loadState(); s.user=null; saveState(s); refresh(); };
+refresh();
+</script>
+</main></body></html>

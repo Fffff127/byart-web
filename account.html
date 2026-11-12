@@ -1,0 +1,46 @@
+<!DOCTYPE html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>บัญชีของฉัน - By-ART</title>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@500;700;800&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css"></head><body><main>
+<header class="nav"><div class="brand">By-ART</div><div class="navlinks"><a class="btn" href="index.html">หน้าหลัก</a><a class="btn" href="pricing.html">แพ็กเกจ/เติมเครดิต</a><button class="btn ghost" id="logout">ออกจากระบบ</button></div></header>
+<h1>บัญชีของฉัน</h1>
+<div class="card" id="info"></div>
+<div class="card">
+  <h2 style="font:700 1.2rem Prompt;margin:0 0 6px">ดาวน์โหลด (ตามสิทธิ์)</h2>
+  <p class="mu small">การดาวน์โหลด/สิทธิ์บนเว็บ static นี้เป็นการจำลองตามสถานะในเบราว์เซอร์ หากต้องการล็อกดาวน์โหลดต่อบัญชีจริงและตรวจสอบการชำระเงินจริง ต้องใช้ระบบหลังบ้าน</p>
+  <div class="row"><a class="btn pri" id="dl" href="ByART_ThaiMod_Setup.zip" download>ดาวน์โหลด ByART_ThaiMod_Setup.zip</a><a class="btn" href="Scam With Your Friends.rar" download>ดาวน์โหลด Scam With Your Friends.rar</a></div>
+  <div id="dlMsg" class="warn small" style="margin-top:10px"></div>
+</div>
+<div class="card">
+  <h2 style="font:700 1.2rem Prompt;margin:0 0 6px">คำสั่งซื้อ/รายการล่าสุด</h2>
+  <div id="orders" class="small mu">ยังไม่มีรายการ</div>
+</div>
+<div class="card">
+  <h2 style="font:700 1.2rem Prompt;margin:0 0 6px">นโยบายการใช้งาน (ตามที่กำหนด)</h2>
+  <ul class="small mu">
+    <li>ทดลองใช้งานไม่เกิน 3 วัน เมื่อหมดช่วงทดลองต้องเติมเครดิต/ซื้อแพ็กเกจ</li>
+    <li>แพ็กเกจ: 7 วัน 20 บาท, 14 วัน 35 บาท, 30 วัน 80 บาท, ถาวร 200 บาท (ถาวรใช้งานไม่จำกัด ไม่มีหมดอายุ)</li>
+    <li>การแจ้งเตือนในเว็บ/แอป, การบล็อกดาวน์โหลดเมื่อหมดสิทธิ์, และการลบม็อดออกอัตโนมัติเมื่อเกินกำหนด ต้องมีการบังคับใช้ในแอป/ม็อดร่วมกับการตรวจสิทธิ์จากเซิร์ฟเวอร์เพื่อให้ทำงานจริงและปลอดภัย</li>
+  </ul>
+</div>
+<script src="app.js"></script>
+<script>
+if(!requireAuth()){}
+document.getElementById('logout').onclick=logout;
+function render(){
+  const a=getAccount();
+  const t=trialLeftMs(a); const trialText = t>0 ? ('เหลือ ~'+Math.ceil(t/86400000)+' วัน (สิ้นสุด '+fmtDate((a.trialStart||Date.now())+3*86400000)+')') : 'หมดช่วงทดลองแล้ว';
+  const planText = a.permanent ? 'ถาวร (ใช้งานไม่จำกัด)' : (a.planUntil && a.planUntil>Date.now() ? (a.plan+' ถึง '+fmtDate(a.planUntil)) : 'ไม่มีแพ็กเกจที่ใช้งานอยู่');
+  document.getElementById('info').innerHTML = '<div class="row" style="justify-content:space-between"><div><b>บัญชี:</b> '+a.email+'</div><span class="badge">'+(hasAccess(a)?'มีสิทธิ์ใช้งาน':'หมดสิทธิ์/ต้องชำระเงิน')+'</span></div>'
+    +'<div style="margin-top:8px"><b>สถานะ:</b> '+accessReason(a)+'</div>'
+    +'<div><b>ช่วงทดลอง 3 วัน:</b> '+trialText+'</div>'
+    +'<div><b>แพ็กเกจ:</b> '+planText+'</div>'
+    +'<div><b>เครดิต (เดโม):</b> '+(a.credits||0)+' บาท</div>';
+  document.getElementById('dlMsg').textContent = hasAccess(a)? 'คุณมีสิทธิ์ดาวน์โหลดในสถานะปัจจุบัน (เดโมฝั่งเบราว์เซอร์)' : 'ดาวน์โหลดถูกจำกัด: '+accessReason(a)+' — ไปที่หน้าแพ็กเกจ/เติมเครดิต';
+  const os=(a.pendingOrders||[]);
+  document.getElementById('orders').innerHTML = os.length? ('<table><tr><th>เวลา</th><th>รายการ</th><th>ยอด</th><th>สถานะ</th></tr>'+os.map(o=>'<tr><td>'+fmtDate(o.createdAt)+'</td><td>'+o.label+'</td><td>฿'+o.amountTHB+'</td><td>'+o.status+'</td></tr>').join('')+'</table>') : 'ยังไม่มีรายการ';
+}
+document.getElementById('dl').addEventListener('click', guardDownload);
+render();
+setInterval(render, 30000);
+</script>
+</main></body></html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>แพ็กเกจและชำระเงิน - By-ART</title>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@500;700;800&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>.price{font:800 1.8rem Prompt,sans-serif;color:var(--ac)} .plan{cursor:pointer} .plan.sel{outline:2px solid var(--ac)} .qr-wrap{display:grid;grid-template-columns:260px 1fr;gap:16px} @media(max-width:760px){.qr-wrap{grid-template-columns:1fr}}</style>
+</head><body><main>
+<header class="nav"><div class="brand">By-ART</div><div class="navlinks"><a class="btn" href="index.html">หน้าหลัก</a><a class="btn" href="login.html">เข้าสู่ระบบ</a><a class="btn" href="account.html">บัญชีของฉัน</a></div></header>
+<h1>แพ็กเกจและชำระเงิน</h1>
+<div class="card">
+  <div class="grid" id="plans">
+    <div class="card plan" data-id="w1" data-label="7 วัน" data-days="7" data-price="20"><b>7 วัน</b><div class="price">฿20</div><div class="mu">ใช้งาน 7 วัน</div></div>
+    <div class="card plan" data-id="w2" data-label="14 วัน" data-days="14" data-price="35"><b>14 วัน</b><div class="price">฿35</div><div class="mu">ใช้งาน 14 วัน</div></div>
+    <div class="card plan" data-id="m1" data-label="30 วัน" data-days="30" data-price="80"><b>30 วัน</b><div class="price">฿80</div><div class="mu">ใช้งาน 30 วัน</div></div>
+    <div class="card plan" data-id="life" data-label="ถาวร" data-days="0" data-price="200" data-perm="1"><b>ถาวร</b><div class="price">฿200</div><div class="mu">ใช้งานไม่จำกัด ไม่มีหมดอายุ/ไม่มีลบอัตโนมัติ (ตามสิทธิ์แพ็กเกจ)</div></div>
+  </div>
+  <div class="warn small">ทดลองใช้งาน: สูงสุด 3 วัน (นับจากเริ่มใช้งานบัญชีในระบบนี้) เมื่อเกินระยะทดลองต้องซื้อแพ็กเกจ/เติมเครดิตจึงจะดาวน์โหลด/ใช้งานต่อได้ — การบังคับลบม็อดออกอัตโนมัติในเครื่องเมื่อหมดอายุ และการแจ้งเตือนในแอป ต้องทำในตัวม็อด/ตัวติดตั้งร่วมกับการตรวจสิทธิ์จากเซิร์ฟเวอร์ (ระบบจริง)</div>
+</div>
+
+<div class="card" id="checkout">
+  <h2 style="font:700 1.2rem Prompt;margin:0 0 6px">ชำระเงิน / เติมเครดิต</h2>
+  <div class="qr-wrap">
+    <div>
+      <div class="qrbox"><img src="qr_payment.png" alt="QR ชำระเงิน"><div class="qr-mask" aria-hidden="true"></div></div>
+      <div class="mu small" style="margin-top:6px">แสดงเฉพาะ QR และยอดเงิน (ปิดชื่อบนภาพที่แสดง)</div>
+    </div>
+    <div>
+      <div>แพ็กเกจที่เลือก: <b id="selLabel">-</b></div>
+      <div style="margin-top:4px">ยอดที่ต้องชำระ: <span class="price" id="selPrice">฿-</span></div>
+      <p class="mu small">ช่องทางที่ต้องการ: โอน/ทรูมันนี่ (ชำระจริง) — สแกน QR และโอนตามยอดที่แสดง</p>
+      <div class="warn small danger"><b>สำคัญ (ระบบจริง):</b> เว็บไซต์ static บน GitHub Pages ไม่สามารถ “ตรวจสอบการโอน/ชำระเงินจริงอัตโนมัติ” ได้เอง ต้องเชื่อมผู้ให้บริการชำระเงิน (webhook/API/ตรวจสลิป) และระบบหลังบ้านเพื่อยืนยันแล้วจึงเปิดสิทธิ์/ปล่อยดาวน์โหลดอัตโนมัติ ปุ่มด้านล่างนี้เป็น <b>การยืนยันในโหมดเดโม (บันทึกสถานะในเบราว์เซอร์นี้เท่านั้น)</b> เพื่อให้ทดสอบโฟลว์เว็บไซต์ได้ ไม่ใช่การยืนยันการรับเงินจริง</div>
+      <div class="row" style="margin-top:10px"><button class="btn pri" id="payBtn">ฉันชำระเงินแล้ว (ยืนยันเดโม)</button><a class="btn ghost" href="account.html">ไปบัญชีของฉัน</a></div>
+      <div id="payMsg" class="warn small" style="margin-top:10px"></div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h2 style="font:700 1.2rem Prompt;margin:0 0 6px">ไฟล์เกมที่แนบ (local)</h2>
+  <p class="mu">หากวางไฟล์ <b>Scam With Your Friends.rar</b> ไว้ในโฟลเดอร์เดียวกับหน้าเว็บ สามารถดาวน์โหลดได้จากลิงก์นี้ (ไฟล์ขนาดใหญ่ อาจขึ้นกับเบราว์เซอร์/การเปิดแบบ local)</p>
+  <a class="btn" href="Scam With Your Friends.rar" download>ดาวน์โหลด Scam With Your Friends.rar</a>
+</div>
+
+<script src="app.js"></script>
+<script>
+let selected=null;
+const plans=[...document.querySelectorAll('.plan')];
+function renderSel(){ document.getElementById('selLabel').textContent=selected?selected.label:'-'; document.getElementById('selPrice').textContent=selected?('฿'+selected.price):'฿-'; }
+plans.forEach(p=>p.onclick=()=>{ plans.forEach(x=>x.classList.remove('sel')); p.classList.add('sel'); selected={id:p.dataset.id,label:p.dataset.label,days:+p.dataset.days,price:+p.dataset.price,perm:p.dataset.perm==='1'}; renderSel(); });
+plans[0].click();
+document.getElementById('payBtn').onclick=()=>{
+  if(!requireAuth()) return;
+  if(!selected){ document.getElementById('payMsg').textContent='กรุณาเลือกแพ็กเกจก่อน'; return; }
+  const order={id:'ord_'+Date.now(), type:'plan', label:selected.label, days:selected.days, permanent:selected.perm, amountTHB:selected.price, status:'pending', createdAt:Date.now()};
+  addPendingOrder(order);
+  confirmMockPayment(order.id); // DEMO
+  document.getElementById('payMsg').textContent='บันทึกคำสั่งซื้อและยืนยันเดโมสำเร็จ: '+selected.label+' ('+selected.price+' บาท) — สถานะสิทธิ์อัปเดตในเบราว์เซอร์นี้แล้ว (ไม่ใช่การตรวจสอบการโอนเงินจริง)';
+};
+</script>
+</main></body></html>
