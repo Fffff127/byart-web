@@ -25,10 +25,14 @@
     <div>
       <div>แพ็กเกจที่เลือก: <b id="selLabel">-</b></div>
       <div style="margin-top:4px">ยอดที่ต้องชำระ: <span class="price" id="selPrice">฿-</span></div>
-      <p class="mu small">ช่องทางที่ต้องการ: โอน/ทรูมันนี่ (ชำระจริง) — สแกน QR และโอนตามยอดที่แสดง</p>
-      <div class="warn small danger"><b>สำคัญ (ระบบจริง):</b> เว็บไซต์ static บน GitHub Pages ไม่สามารถ “ตรวจสอบการโอน/ชำระเงินจริงอัตโนมัติ” ได้เอง ต้องเชื่อมผู้ให้บริการชำระเงิน (webhook/API/ตรวจสลิป) และระบบหลังบ้านเพื่อยืนยันแล้วจึงเปิดสิทธิ์/ปล่อยดาวน์โหลดอัตโนมัติ ปุ่มด้านล่างนี้เป็น <b>การยืนยันในโหมดเดโม (บันทึกสถานะในเบราว์เซอร์นี้เท่านั้น)</b> เพื่อให้ทดสอบโฟลว์เว็บไซต์ได้ ไม่ใช่การยืนยันการรับเงินจริง</div>
-      <div class="row" style="margin-top:10px"><button class="btn pri" id="payBtn">ฉันชำระเงินแล้ว (ยืนยันเดโม)</button><a class="btn ghost" href="account.html">ไปบัญชีของฉัน</a></div>
+      <p class="mu small">โอนเงินจริง/ทรูมันนี่ — สแกน QR และโอนตามยอดที่แสดง จากนั้นแนบสลิปเพื่อส่งตรวจสอบ</p>
+      <label for="slip">แนบสลิปการโอน (รูปภาพ)</label>
+      <input id="slip" type="file" accept="image/*">
+      <label for="note">หมายเหตุ/ชื่อผู้โอน (ถ้ามี)</label>
+      <input id="note" type="text" placeholder="เช่น ชื่อผู้โอน หรือเวลาที่โอน">
+      <div class="row" style="margin-top:10px"><button class="btn pri" id="submitSlipBtn">ส่งสลิปเพื่อรอตรวจสอบ</button><button class="btn ghost" id="payBtn" type="button">ยืนยันเดโม (ไม่ใช่การโอนจริง)</button></div>
       <div id="payMsg" class="warn small" style="margin-top:10px"></div>
+      <div class="warn small" style="margin-top:8px"><b>ระบบตรวจสอบสลิป:</b> หากเปิดใช้งานระบบหลังบ้าน (Supabase/ฐานข้อมูล) คำสั่งซื้อและสลิปจะถูกบันทึกและรอแอดมิน/ระบบตรวจสอบก่อนเปิดสิทธิ์. ในโหมดนี้ (ยังไม่ตั้งค่าหลังบ้าน) ระบบจะบันทึกคำสั่งซื้อและสลิปไว้ในเบราว์เซอร์เป็นสถานะ <b>รอตรวจสอบ</b> (เดโม) — การยืนยันการโอนจริงอัตโนมัติยังต้องเชื่อมบริการตรวจสลิป/API และเซิร์ฟเวอร์</div>
     </div>
   </div>
 </div>
@@ -51,13 +55,31 @@ const plans=[...document.querySelectorAll('.plan')];
 function renderSel(){ document.getElementById('selLabel').textContent=selected?selected.label:'-'; document.getElementById('selPrice').textContent=selected?('฿'+selected.price):'฿-'; }
 plans.forEach(p=>p.onclick=()=>{ plans.forEach(x=>x.classList.remove('sel')); p.classList.add('sel'); selected={id:p.dataset.id,label:p.dataset.label,days:+p.dataset.days,price:+p.dataset.price,perm:p.dataset.perm==='1'}; renderSel(); });
 plans[0].click();
+function fileToDataUrl(file){return new Promise((res,rej)=>{ if(!file) return res(null); const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); });}
+
+document.getElementById('submitSlipBtn').onclick=async()=>{
+  if(!requireAuth()) return;
+  if(!selected){ document.getElementById('payMsg').textContent='กรุณาเลือกแพ็กเกจก่อน'; return; }
+  const slipFile=document.getElementById('slip').files[0];
+  if(!slipFile){ document.getElementById('payMsg').textContent='กรุณาแนบสลิปการโอนก่อนส่ง'; return; }
+  document.getElementById('payMsg').textContent='กำลังส่งสลิป...';
+  try{
+    const slipData = await fileToDataUrl(slipFile);
+    const note=(document.getElementById('note').value||'').trim();
+    const order={id:'ord_'+Date.now(), type:'plan', label:selected.label, days:selected.days, permanent:selected.perm, amountTHB:selected.price, status:'pending_review', slipData, slipName:slipFile.name, note, createdAt:Date.now()};
+    addPendingOrder(order);
+    document.getElementById('payMsg').textContent='ส่งสลิปเรียบร้อย: '+selected.label+' ('+selected.price+' บาท) — สถานะ: รอตรวจสอบสลิป (ในโหมดปัจจุบันบันทึกในเบราว์เซอร์; เมื่อเชื่อมระบบหลังบ้านจะส่งให้แอดมิน/ระบบตรวจสอบจริง)';
+    document.getElementById('slip').value=''; document.getElementById('note').value='';
+  }catch(e){ document.getElementById('payMsg').textContent='ไม่สามารถอ่านไฟล์สลิปได้ กรุณาลองใหม่'; }
+};
+
 document.getElementById('payBtn').onclick=()=>{
   if(!requireAuth()) return;
   if(!selected){ document.getElementById('payMsg').textContent='กรุณาเลือกแพ็กเกจก่อน'; return; }
   const order={id:'ord_'+Date.now(), type:'plan', label:selected.label, days:selected.days, permanent:selected.perm, amountTHB:selected.price, status:'pending', createdAt:Date.now()};
   addPendingOrder(order);
   confirmMockPayment(order.id); // DEMO
-  document.getElementById('payMsg').textContent='บันทึกคำสั่งซื้อและยืนยันเดโมสำเร็จ: '+selected.label+' ('+selected.price+' บาท) — สถานะสิทธิ์อัปเดตในเบราว์เซอร์นี้แล้ว (ไม่ใช่การตรวจสอบการโอนเงินจริง)';
+  document.getElementById('payMsg').textContent='ยืนยันเดโมสำเร็จ: '+selected.label+' ('+selected.price+' บาท) — อัปเดตสิทธิ์ในเบราว์เซอร์นี้แล้ว (ไม่ใช่การตรวจสอบการโอนเงินจริง)';
 };
 </script>
 </main></body></html>

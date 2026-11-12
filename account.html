@@ -41,7 +41,8 @@ function render(){
     +'<div><b>เครดิต (เดโม):</b> '+(a.credits||0)+' บาท</div>';
   document.getElementById('dlMsg').textContent = hasAccess(a)? 'คุณมีสิทธิ์ดาวน์โหลดในสถานะปัจจุบัน (เดโมฝั่งเบราว์เซอร์)' : 'ดาวน์โหลดถูกจำกัด: '+accessReason(a)+' — ไปที่หน้าแพ็กเกจ/เติมเครดิต';
   const os=(a.pendingOrders||[]);
-  document.getElementById('orders').innerHTML = os.length? ('<table><tr><th>เวลา</th><th>รายการ</th><th>ยอด</th><th>สถานะ</th></tr>'+os.map(o=>'<tr><td>'+fmtDate(o.createdAt)+'</td><td>'+o.label+'</td><td>฿'+o.amountTHB+'</td><td>'+o.status+'</td></tr>').join('')+'</table>') : 'ยังไม่มีรายการ';
+  const statusText = (st)=> st==='paid'?'ชำระแล้ว/อนุมัติ': st==='pending_review'?'รอตรวจสอบสลิป': st==='rejected'?'ไม่ผ่าน': st==='pending'?'รอดำเนินการ': st;
+  document.getElementById('orders').innerHTML = os.length? ('<table><tr><th>เวลา</th><th>รายการ</th><th>ยอด</th><th>สถานะ</th><th>สลิป</th></tr>'+os.map(o=>'<tr><td>'+fmtDate(o.createdAt)+'</td><td>'+o.label+'</td><td>฿'+o.amountTHB+'</td><td>'+statusText(o.status)+'</td><td>'+(o.slipData?'<a href="'+o.slipData+'" target="_blank">ดูสลิป</a>':'-')+'</td></tr>').join('')+'</table>') : 'ยังไม่มีรายการ';
 }
 document.getElementById('dl').addEventListener('click', guardDownload);
 render();

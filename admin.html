@@ -1,0 +1,45 @@
+<!DOCTYPE html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ตรวจสอบคำสั่งซื้อ (แอดมิน) - By-ART</title>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@500;700;800&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css"></head><body><main>
+<header class="nav"><div class="brand">By-ART (Admin)</div><div class="navlinks"><a class="btn" href="index.html">หน้าหลัก</a><a class="btn" href="account.html">บัญชี</a></div></header>
+<h1>ตรวจสอบสลิป/คำสั่งซื้อ</h1>
+<div class="warn small danger"><b>โหมดเดโม (localStorage):</b> หน้านี้อ่านและอนุมัติคำสั่งซื้อที่บันทึกในเบราว์เซอร์เครื่องนี้เท่านั้น ใช้สำหรับทดสอบโฟลว์ “แนบสลิป → รอตรวจสอบ → อนุมัติ/ปฏิเสธ”. สำหรับระบบจริงให้เชื่อมฐานข้อมูล/Storage (เช่น Supabase ตาม <code>SUPABASE_SETUP.md</code>) และทำหน้าตรวจสอบฝั่งที่มีสิทธิ์แอดมินอย่างปลอดภัย</div>
+<div class="card">
+  <label for="adminEmail">อีเมลบัญชีที่ต้องการตรวจสอบ</label>
+  <input id="adminEmail" type="email" placeholder="user@example.com">
+  <div class="row" style="margin-top:10px"><button class="btn pri" id="loadBtn">โหลดคำสั่งซื้อ</button></div>
+</div>
+<div class="card"><h2>รายการคำสั่งซื้อ</h2><div id="orders" class="small mu">กรอกอีเมลแล้วกดโหลด</div></div>
+<script src="app.js"></script>
+<script>
+let targetEmail='';
+function renderOrders(){
+  const s=loadState(); const a=(s.accounts||{})[targetEmail];
+  const el=document.getElementById('orders');
+  if(!a){ el.textContent='ไม่พบบัญชีนี้ในเบราว์เซอร์'; return; }
+  const os=a.pendingOrders||[];
+  if(!os.length){ el.textContent='ไม่มีคำสั่งซื้อ'; return; }
+  el.innerHTML='<table><tr><th>เวลา</th><th>รายการ</th><th>ยอด</th><th>สถานะ</th><th>สลิป/หมายเหตุ</th><th>จัดการ</th></tr>'+os.map(o=>{
+    const slip=o.slipData?('<a href="'+o.slipData+'" target="_blank">ดูสลิป</a>'):'-';
+    const note=o.note?('<div class="mu">'+o.note+'</div>'):'';
+    const actions = (o.status==='paid') ? '-' : ('<button class="btn pri" data-approve="'+o.id+'">อนุมัติ</button> <button class="btn" data-reject="'+o.id+'">ปฏิเสธ</button>');
+    return '<tr><td>'+fmtDate(o.createdAt)+'</td><td>'+o.label+'</td><td>฿'+o.amountTHB+'</td><td>'+o.status+'</td><td>'+slip+note+'</td><td>'+actions+'</td></tr>';
+  }).join('')+'</table>';
+  el.querySelectorAll('[data-approve]').forEach(b=>b.onclick=()=>{ approveOrder(targetEmail,b.dataset.approve); renderOrders(); });
+  el.querySelectorAll('[data-reject]').forEach(b=>b.onclick=()=>{ rejectOrder(targetEmail,b.dataset.reject); renderOrders(); });
+}
+function approveOrder(email, orderId){
+  const s=loadState(); const a=(s.accounts||{})[email]; if(!a) return;
+  const o=(a.pendingOrders||[]).find(x=>x.id===orderId); if(!o||o.status==='paid') return;
+  o.status='paid'; o.paidAt=Date.now();
+  if(o.permanent){ a.permanent=true; a.plan='ถาวร'; a.planUntil=null; }
+  else { const now=Date.now(); const base=(a.planUntil&&a.planUntil>now)?a.planUntil:now; a.planUntil=base + (o.days||0)*86400000; a.plan=o.label; }
+  s.accounts[email]=a; saveState(s);
+}
+function rejectOrder(email, orderId){
+  const s=loadState(); const a=(s.accounts||{})[email]; if(!a) return;
+  const o=(a.pendingOrders||[]).find(x=>x.id===orderId); if(!o) return; o.status='rejected'; s.accounts[email]=a; saveState(s);
+}
+document.getElementById('loadBtn').onclick=()=>{ targetEmail=(document.getElementById('adminEmail').value||'').trim().toLowerCase(); renderOrders(); };
+</script>
+</main></body></html>
